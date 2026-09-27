@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSVP Responses — Tanya &amp; Blessing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#221a13;--muted:#7c6f60;--cream:#f6efe2;--ivory:#fffdf7;--gold:#c19a4b;--gold-deep:#8a6a2c;--line:#e0d3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:60px 6% 80px}
+.eyebrow{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-deep);font-weight:500}
+h1{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(38px,5vw,58px);margin:10px 0 4px}
+.sub{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:30px 0}
+.stat{background:var(--ivory);border:1px solid var(--line);border-top:3px solid var(--gold);padding:20px;text-align:center}
+.stat b{display:block;font-family:"Cormorant Garamond",serif;font-size:42px;line-height:1}
+.stat span{font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters input,.filters select{flex:1;min-width:160px;padding:12px 14px;border:1px solid var(--line);background:var(--ivory);font-family:inherit;font-size:14px;color:var(--ink);border-radius:2px}
+.filters input:focus,.filters select:focus{outline:none;border-color:var(--gold)}
+button,.back{display:inline-block;padding:12px 22px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500;font-family:inherit;border-radius:2px;cursor:pointer;text-decoration:none;transition:.25s}
+button{background:linear-gradient(120deg,#a8842f,#d9b45f 50%,#a8842f);color:#20150a;border:1px solid #8a6a2c}
+button.ghost,.back{background:transparent;color:#4d3d20;border:1px solid rgba(138,106,44,.6)}
+button:hover,.back:hover{transform:translateY(-2px)}
+#msg{color:var(--muted);font-size:14px;margin-bottom:14px}
+.table-card{background:var(--ivory);border:1px solid var(--line);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:640px}
+th{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-deep);text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);background:#faf4e6;font-weight:500}
+td{padding:13px 16px;border-bottom:1px solid #efe5cf;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.when{white-space:nowrap;color:var(--muted);font-size:13px}
+.pill{display:inline-block;padding:3px 12px;border-radius:100px;font-size:12px;border:1px solid}
+.pill.yes{color:#3d6b2f;border-color:#9dbf93;background:#f0f6ec}
+.pill.no{color:#8a3d2b;border-color:#d3a295;background:#f9efec}
+@media(max-width:640px){.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Private · hosts only</div>
+  <h1>RSVP Responses</h1>
+  <p class="sub">Tanya &amp; Blessing — Lobola Celebration · 17 October 2026</p>
+  <div class="stats">
+    <div class="stat"><b id="stTotal">0</b><span>Responses</span></div>
+    <div class="stat"><b id="stYes">0</b><span>Attending</span></div>
+    <div class="stat"><b id="stGuests">0</b><span>Total guests</span></div>
+  </div>
+  <div class="actions">
+    <button id="refresh">Refresh</button>
+    <button class="ghost" id="csv">Download CSV</button>
+    <a class="back" href="/">Back to invitation</a>
+  </div>
+  <div class="filters">
+    <input id="q" placeholder="Search name or message…" autocomplete="off">
+    <select id="fAtt"><option value="">All responses</option><option value="yes">Attending</option><option value="no">Not attending</option></select>
+    <select id="fSort"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="name">Name A–Z</option></select>
+  </div>
+  <p id="msg">Loading…</p>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>Name</th><th>Attending</th><th>Guests</th><th>Message</th><th>Received</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+<script>
+(function(){
+  var rows=document.getElementById("rows"),msg=document.getElementById("msg"),data=[],
+      qe=document.getElementById("q"),fe=document.getElementById("fAtt"),se=document.getElementById("fSort");
+  [qe,fe,se].forEach(function(el){el.addEventListener("input",render)});
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function fmtDate(iso){try{var d=new Date(iso);return d.toLocaleString()}catch(e){return iso||""}}
+  function attending(r){return/^yes/i.test(r.attending||"")}
+  function load(){
+    msg.textContent="Loading…";
+    fetch("api/rsvps?_="+Date.now()).then(function(r){if(!r.ok)throw new Error();return r.json()}).then(function(d){
+      data=d;render();
+    }).catch(function(){msg.textContent="Could not load responses. Open this page via the preview server (http://PC-address:8080/rsvps.html)."});
+  }
+  function filtered(){
+    var q=qe.value.trim().toLowerCase(),fa=fe.value,fs=se.value;
+    var out=data.filter(function(r){
+      if(fa==="yes"&&!attending(r))return false;
+      if(fa==="no"&&attending(r))return false;
+      if(q&&(String(r.name||"").toLowerCase().indexOf(q)<0&&String(r.message||"").toLowerCase().indexOf(q)<0))return false;
+      return true;
+    });
+    out.sort(function(a,b){
+      if(fs==="name")return String(a.name||"").localeCompare(String(b.name||""));
+      if(fs==="old")return new Date(a.at)-new Date(b.at);
+      return new Date(b.at)-new Date(a.at);
+    });
+    return out;
+  }
+  function render(){
+    var yes=0,guests=0,view=filtered();
+    data.forEach(function(r){if(attending(r)){yes++;guests+=parseInt(r.guests,10)||0}});
+    rows.innerHTML=view.map(function(r){
+      var y=attending(r);
+      return "<tr><td><b>"+esc(r.name)+"</b></td><td><span class=\"pill "+(y?"yes":"no")+"\">"+esc(r.attending)+"</span></td><td>"+esc(r.guests)+"</td><td>"+esc(r.message||"—")+"</td><td class=\"when\">"+esc(fmtDate(r.at))+"</td></tr>";
+    }).join("")||"<tr><td colspan=\"5\" style=\"text-align:center;color:var(--muted)\">No matches.</td></tr>";
+    document.getElementById("stTotal").textContent=data.length;
+    document.getElementById("stYes").textContent=yes;
+    document.getElementById("stGuests").textContent=guests;
+    msg.textContent=data.length?("Showing "+view.length+" of "+data.length+" response"+(data.length===1?"":"s")+"."):"No responses yet — share the invitation link.";
+  }
+  document.getElementById("refresh").addEventListener("click",load);
+  document.getElementById("csv").addEventListener("click",function(){
+    var view=filtered();
+    if(!view.length)return;
+    var q=function(v){return '"'+String(v==null?"":v).replace(/"/g,'""')+'"'};
+    var csv=["Name,Attending,Guests,Message,Received"].concat(view.map(function(r){return[q(r.name),q(r.attending),q(r.guests),q(r.message),q(r.at)].join(",")})).join("\r\n");
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download="rsvps.csv";document.body.appendChild(a);a.click();a.remove();
+  });
+  load();
+})();
+</script>
+</body>
+</html>
