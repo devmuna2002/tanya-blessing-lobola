@@ -39,7 +39,7 @@ http.createServer(async (req, res) => {
       return;
     }
     if (url === "/rsvps.json") { res.writeHead(403, cors); res.end(); return; }
-    const file = path.join(ROOT, url === "/" ? "/lobo-wedding_template.html" : url);
+    const file = path.join(ROOT, url === "/" ? "/index.html" : url);
     if (!file.startsWith(ROOT)) { res.writeHead(403, cors); res.end(); return; }
     fs.readFile(file, (err, data) => {
       if (err) { res.writeHead(404, cors); res.end("not found"); return; }
