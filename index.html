@@ -383,7 +383,7 @@ section{position:relative}
   <div class="wm" data-plx="0.1" aria-hidden="true">journey</div>
   <div class="wrap">
     <div class="center">
-      <div class="eyebrow rv">Our celebration</div>
+      <div class="eyebrow rv">Our Lobo-Wedding</div>
       <h2 class="title rv" style="--d:.1s">Two families, <em>one journey</em></h2>
     </div>
     <div class="split">
@@ -445,8 +445,8 @@ section{position:relative}
       <h2 class="title rv" style="--d:.1s">A few <em>details</em></h2>
     </div>
     <div class="notes">
-      <div class="note rv" style="--d:.05s"><div class="n">No. 01</div><h3>Dress Code</h3><p>Elegant traditional wear or formal attire. Shades of gold, champagne and earth tones are warmly welcomed.</p></div>
-      <div class="note rv" style="--d:.15s"><div class="n">No. 02</div><h3>Arrival</h3><p>Please arrive from 12:00 so the celebration can begin promptly at 12:30. Kindly RSVP by 3 October 2026.</p></div>
+      <div class="note rv" style="--d:.05s"><div class="n">No. 01</div><h3>Arrival</h3><p>Please arrive from 12:00 so the Lobo-Wedding can begin promptly at 12:30. Kindly RSVP by 3 October 2026.</p></div>
+      <div class="note rv" style="--d:.15s"><div class="n">No. 02</div><h3>Dress Code</h3><p>Ivory, Beige, Khaki</p></div>
     </div>
   </div>
 </section>
@@ -461,10 +461,7 @@ section{position:relative}
       <div class="seal">T&amp;B</div>
       <form class="form" id="rsvpForm" novalidate>
         <div><label for="fName">Your full name</label><input id="fName" required placeholder="e.g. Tendai Moyo" autocomplete="name"></div>
-        <div class="row">
-          <div><label for="fAttend">Will you attend?</label><select id="fAttend" required><option value="">Select an option</option><option>Yes, with pleasure</option><option>Sorry, I cannot attend</option></select></div>
-          <div><label for="fGuests">Guests</label><input id="fGuests" type="number" min="1" max="10" value="1"></div>
-        </div>
+        <div><label for="fAttend">Will you attend?</label><select id="fAttend" required><option value="">Select an option</option><option>Yes, with pleasure</option><option>Sorry, I cannot attend</option></select></div>
         <button class="btn gold" type="submit">Send RSVP</button>
         <p class="form-error" id="rsvpError">Could not save your RSVP — please check your connection and try again.</p>
       </form>
@@ -640,10 +637,28 @@ section{position:relative}
     document.getElementById("rsvpError").classList.remove("show");
     var btn=form.querySelector("button[type=submit]");
     btn.disabled=true;btn.textContent="Sending…";
-    fetch("api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.value.trim(),attending:att.value,guests:document.getElementById("fGuests").value||"1"})})
+    var payload={name:name.value.trim(),attending:att.value};
+    function onOK(){
+      form.style.display="none";document.getElementById("rsvpSuccess").classList.add("show");
+    }
+    function onFallback(){
+      // Static host (no /api): keep a local backup + hand off to WhatsApp
+      // so the RSVP still reaches the hosts. Set WHATSAPP_NUMBER to receive
+      // it directly, e.g. "263771234567". Empty = guest picks the contact.
+      var WHATSAPP_NUMBER="";
+      try{localStorage.setItem("tb-rsvp",JSON.stringify({name:payload.name,attending:payload.attending,at:new Date().toISOString()}))}catch(e){}
+      var msg=encodeURIComponent("RSVP — Tanya & Blessing Lobo-Wedding\nName: "+payload.name+"\nAttending: "+payload.attending);
+      onOK();
+      setTimeout(function(){window.open((WHATSAPP_NUMBER?"https://wa.me/"+WHATSAPP_NUMBER+"?text=":"https://wa.me/?text=")+msg,"_blank")},800);
+    }
+    fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
       .then(function(r){if(!r.ok)throw new Error("save failed");return r.json()})
-      .then(function(d){if(!d.ok)throw new Error("save failed");form.style.display="none";document.getElementById("rsvpSuccess").classList.add("show")})
-      .catch(function(){btn.disabled=false;btn.textContent="Send RSVP";document.getElementById("rsvpError").classList.add("show")});
+      .then(function(d){if(!d.ok)throw new Error("save failed");onOK()})
+      .catch(function(){
+        // If the API endpoint exists the save failed for real — show error.
+        // If we are on a static host (404 / network fail), use the fallback.
+        fetch("/api/rsvps?_="+Date.now(),{method:"GET"}).then(function(){btn.disabled=false;btn.textContent="Send RSVP";document.getElementById("rsvpError").classList.add("show")}).catch(onFallback);
+      });
   });
 
   var gate=document.getElementById("gate"),openBtn=document.getElementById("openBtn"),cardEl=document.getElementById("inviteCard");

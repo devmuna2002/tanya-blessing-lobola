@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanya & Blessing — Lobola Celebration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background: #3a352c url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200&q=60&auto=format&fit=crop') center/cover no-repeat;
+    background-blend-mode: multiply;
+    background-color: #4a4438;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 32px 16px;
+    font-family: 'Jost', sans-serif;
+  }
+  .stage {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    width:100%;
+    max-width:520px;
+  }
+  .card {
+    width:100%;
+    max-width:480px;
+    aspect-ratio: 5/7.2;
+    background: linear-gradient(165deg, #b8a988 0%, #a89a7d 35%, #94835f 100%);
+    border-radius: 4px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 4px 18px rgba(0,0,0,0.4);
+    color: #FFFEF5;
+    display:flex;
+  }
+  .card-inner {
+    position:relative;
+    z-index:2;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    text-align:center;
+    padding: 36px 36px 42px;
+  }
+  .floral {
+    position:absolute;
+    top:-10px; left:-10px;
+    width:78%;
+    height:48%;
+    z-index:1;
+    background-image: url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80&auto=format&fit=crop');
+    background-size:cover;
+    background-position: center 30%;
+    clip-path: ellipse(85% 90% at 10% 0%);
+    filter: sepia(0.35) saturate(0.9) brightness(1.05);
+  }
+  .floral::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(to bottom, rgba(168,154,125,0) 45%, #a89a7d 92%, #94835f 100%),
+                linear-gradient(to right, rgba(168,154,125,0) 55%, rgba(148,131,95,0.9) 95%);
+  }
+  .pampas {
+    position:absolute;
+    top:0; left:0;
+    width:78%; height:52%;
+    z-index:2;
+    background-image: url('https://images.unsplash.com/photo-1520763185298-1b434c919102?w=800&q=80&auto=format&fit=crop');
+    background-size:cover;
+    background-position: top center;
+    clip-path: ellipse(75% 82% at 18% 0%);
+    mix-blend-mode: screen;
+    opacity:0.55;
+    filter: sepia(0.6) brightness(1.4);
+  }
+  .eyebrow {
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    letter-spacing:0.18em;
+    font-size:12px;
+    text-transform:uppercase;
+    opacity:0.95;
+  }
+  .script {
+    font-family:'Great Vibes', cursive;
+    font-size:52px;
+    line-height:1;
+    margin:8px 0 2px;
+    font-weight:400;
+  }
+  .names {
+    font-family:'Cormorant Garamond', serif;
+    font-weight:500;
+    letter-spacing:0.28em;
+    font-size:22px;
+    margin:10px 0;
+    line-height:1.6;
+  }
+  .names span.and {
+    display:block;
+    font-family:'Great Vibes', cursive;
+    letter-spacing:0;
+    font-size:30px;
+    font-weight:400;
+    text-transform:none;
+    margin:2px 0;
+  }
+  .divider {
+    width:56px; height:1px;
+    background:rgba(255,254,245,0.7);
+    margin:14px auto;
+    position:relative;
+  }
+  .divider::after {
+    content:'◆';
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    background:#a29272;
+    padding:0 8px;
+    font-size:8px;
+  }
+  .details {
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    line-height:2;
+    text-transform:uppercase;
+    font-weight:400;
+  }
+  .details .light {
+    text-transform:none;
+    letter-spacing:0.04em;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:16px;
+  }
+  .venue {
+    margin-top:10px;
+    font-size:13px;
+    letter-spacing:0.22em;
+    font-weight:500;
+  }
+  .theme-badge {
+    margin-top:16px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid rgba(255,254,245,0.6);
+    border-radius:100px;
+    padding:7px 16px;
+    font-size:10.5px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+  }
+  .dots { display:flex; gap:6px; }
+  .dots i { width:12px; height:12px; border-radius:50%; display:block; border:1px solid rgba(255,255,255,0.6); }
+  .footer-script {
+    font-family:'Great Vibes', cursive;
+    font-size:20px;
+    margin-top:14px;
+    opacity:0.9;
+  }
+  .actions {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .btn {
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    padding:13px 26px;
+    border-radius:100px;
+    font-family:'Jost', sans-serif;
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    text-decoration:none;
+    transition:transform 0.15s ease;
+  }
+  .btn-primary { background:#FFFEF5; color:#6b5f45; font-weight:500; }
+  .btn-ghost { background:rgba(255,254,245,0.15); color:#FFFEF5; border:1px solid rgba(255,254,245,0.6); backdrop-filter:blur(6px); }
+  .btn:hover { transform:translateY(-1px); }
+  .hint { color:#e9e0cd; font-size:12px; letter-spacing:0.08em; text-align:center; opacity:0.8; }
+  @media (max-width:480px) {
+    .script { font-size:42px; }
+    .names { font-size:18px; }
+    .card-inner { padding:28px 24px 32px; }
+  }
+  @media print {
+    body { background:#fff; padding:0; }
+    .actions, .hint { display:none; }
+    .card { box-shadow:none; max-width:100%; aspect-ratio:auto; min-height:95vh; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="card">
+    <div class="floral"></div>
+    <div class="pampas"></div>
+    <div class="card-inner">
+      <p class="eyebrow">With the blessings of both families</p>
+      <p class="eyebrow" style="margin-top:6px">Please join us for</p>
+      <h1 class="script">The Lobola of</h1>
+      <div class="names">
+        TANYA
+        <span class="and">and</span>
+        BLESSING
+      </div>
+      <div class="divider"></div>
+      <div class="details">
+        Saturday | 17th October 2026<br>
+        <span class="light">at half past twelve in the afternoon</span><br>
+        <div class="venue">Garden of Bliss<br>Gweru</div>
+      </div>
+      <p class="footer-script">traditional celebration to follow</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&query=Garden+of+Bliss+Gweru" target="_blank" rel="noopener">View Venue</a>
+    <button class="btn btn-ghost" onclick="window.print()">Save / Print Card</button>
+  </div>
+  <p class="hint">Tanya & Blessing • 17 October • 12:30 PM • Garden of Bliss, Gweru</p>
+</div>
+</body>
+</html>

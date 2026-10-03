@@ -78,7 +78,7 @@ td.when{white-space:nowrap;color:var(--muted);font-size:13px}
   function attending(r){return/^yes/i.test(r.attending||"")}
   function load(){
     msg.textContent="Loading…";
-    fetch("api/rsvps?_="+Date.now()).then(function(r){if(!r.ok)throw new Error();return r.json()}).then(function(d){
+    fetch("/api/rsvps?_="+Date.now()).then(function(r){if(!r.ok)throw new Error();return r.json()}).then(function(d){
       data=d;render();
     }).catch(function(){msg.textContent="Could not load responses. Open this page via the preview server (http://PC-address:8080/rsvps.html)."});
   }

@@ -1,10 +1,16 @@
-// Local preview server for the invitation site (serves the RSVP database API too).
-// Run: node serve.js  →  open http://localhost:8080
+// Invitation site + RSVP database API.
+// Local: node serve.js  →  open http://localhost:8080
+// Hosted (Render / Railway / VPS): start command `npm start`, port comes from process.env.PORT.
+// NOTE: rsvps.json is local file storage. It works on a VPS or a host with a
+// persistent disk. On ephemeral/static hosts (GitHub Pages, Netlify static,
+// Vercel static) /api/* does not exist — the front-end falls back to WhatsApp,
+// so guests can still RSVP.
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const ROOT = __dirname;
 const DB = path.join(ROOT, "rsvps.json");
+const PORT = Number(process.env.PORT) || 8080;
 const TYPES = { ".html": "text/html", ".jpeg": "image/jpeg", ".jpg": "image/jpeg", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".json": "application/json" };
 function loadRsvps() { try { const d = JSON.parse(fs.readFileSync(DB, "utf8")); return Array.isArray(d) ? d : []; } catch (e) { return []; } }
 function saveRsvps(list) { fs.writeFileSync(DB, JSON.stringify(list, null, 2)); }
@@ -38,13 +44,14 @@ http.createServer(async (req, res) => {
       res.end(JSON.stringify(loadRsvps()));
       return;
     }
-    if (url === "/rsvps.json") { res.writeHead(403, cors); res.end(); return; }
-    const file = path.join(ROOT, url === "/" ? "/index.html" : url);
-    if (!file.startsWith(ROOT)) { res.writeHead(403, cors); res.end(); return; }
+    if (url === "/rsvps.json" || url === "/serve.js" || url === "/server.log" || url === "/package.json" || url === "/package-lock.json") { res.writeHead(403, cors); res.end(); return; }
+    const safePath = path.normalize(path.join(ROOT, url === "/" ? "/index.html" : url));
+    if (!safePath.startsWith(ROOT)) { res.writeHead(403, cors); res.end(); return; }
+    const file = safePath;
     fs.readFile(file, (err, data) => {
       if (err) { res.writeHead(404, cors); res.end("not found"); return; }
       res.writeHead(200, Object.assign({ "Content-Type": TYPES[path.extname(file).toLowerCase()] || "application/octet-stream" }, cors));
       res.end(data);
     });
   } catch (e) { res.writeHead(500, cors); res.end(); }
-}).listen(8080, "0.0.0.0", () => console.log("serving " + ROOT + " on :8080"));
+}).listen(PORT, "0.0.0.0", () => console.log("serving " + ROOT + " on :" + PORT));
