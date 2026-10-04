@@ -1,4 +1,5 @@
 # Guest RSVP data — private, never commit
 rsvps.json
+*.db
 server.log
 node_modules/
