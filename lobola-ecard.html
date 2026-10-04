@@ -775,18 +775,27 @@
     setInterval(tick,1000);
   }
 
-  // ---- RSVP ----
+  // ---- RSVP (silent email) ----
   function handleRsvp(e){
     e.preventDefault();
     const name=document.getElementById('rsvp-name').value.trim();
     const side=document.getElementById('rsvp-side').value;
     const phone=document.getElementById('rsvp-phone').value.trim();
-    const msg=encodeURIComponent(
-      `RSVP — Tanya & Blessing Lobola\nName: ${name}\nSide: ${side||'Not specified'}\nPhone: ${phone||'Not given'}`
-    );
-    document.getElementById('rsvp-done').classList.remove('hide');
-    e.target.reset();
-    setTimeout(()=>{ window.location.href=`https://wa.me/263771179613?text=${msg}`; },800);
+    const done=document.getElementById('rsvp-done');
+    const btn=e.target.querySelector('button[type=submit]');
+    if(btn){btn.disabled=true;btn.textContent='Sending…';}
+    fetch('https://formsubmit.co/ajax/munasheantonio1@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name:name,phone:phone||'Not given',side:side||'Not specified',_subject:'New RSVP — Tanya & Blessing Lobola',_template:'table'})})
+      .then(res=>{if(!res.ok)throw new Error('send failed');return res.json();})
+      .then(()=>{
+        done.classList.remove('hide');
+        e.target.reset();
+        if(btn){btn.disabled=false;btn.textContent='Confirm Attendance';}
+      })
+      .catch(()=>{
+        done.textContent='Could not send your RSVP — please check your connection and try again.';
+        done.classList.remove('hide');
+        if(btn){btn.disabled=false;btn.textContent='Confirm Attendance';}
+      });
   }
 
   // init

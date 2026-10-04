@@ -471,7 +471,7 @@ section{position:relative}
       </form>
       <div class="success" id="rsvpSuccess">
         <div class="big-script">Thank you!</div>
-        <p>Your RSVP is ready in WhatsApp — please tap send there to deliver it.<br>We cannot wait to celebrate with you.</p>
+        <p>Your RSVP has been received with joy.<br>We cannot wait to celebrate with you.</p>
       </div>
     </div>
   </div>
@@ -643,12 +643,13 @@ section{position:relative}
     var btn=form.querySelector("button[type=submit]");
     btn.disabled=true;btn.textContent="Sending…";
     var payload={name:name.value.trim(),attending:att.value};
-    // All RSVPs go to WhatsApp — works on any host (GitHub Pages included).
-    var WHATSAPP_NUMBER="263771179613";
+    // Silent email RSVP — works on any host (GitHub Pages included).
+    // First-ever submission triggers a one-time activation email to the inbox.
     try{localStorage.setItem("tb-rsvp",JSON.stringify({name:payload.name,attending:payload.attending,at:new Date().toISOString()}))}catch(e){}
-    var msg=encodeURIComponent("RSVP — Tanya & Blessing Lobo-Wedding\nName: "+payload.name+"\nAttending: "+payload.attending);
-    form.style.display="none";document.getElementById("rsvpSuccess").classList.add("show");
-    setTimeout(function(){window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+msg,"_blank")},800);
+    fetch("https://formsubmit.co/ajax/munasheantonio1@gmail.com",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({name:payload.name,attending:payload.attending,_subject:"New RSVP — Tanya & Blessing Lobo-Wedding",_template:"table"})})
+      .then(function(r){if(!r.ok)throw new Error("send failed");return r.json()})
+      .then(function(){form.style.display="none";document.getElementById("rsvpSuccess").classList.add("show")})
+      .catch(function(){btn.disabled=false;btn.textContent="Send RSVP";document.getElementById("rsvpError").classList.add("show")});
   });
 
   var gate=document.getElementById("gate"),openBtn=document.getElementById("openBtn"),cardEl=document.getElementById("inviteCard");
